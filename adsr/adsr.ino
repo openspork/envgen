@@ -29,12 +29,17 @@ int stage = 0;  // 0: Attack, 1: Decay, 2: Sustain, 3: Release, 4: Done
 
 void setup() {
     Serial.begin(9600);
-    analogWriteResolution(12);  // Max out DAC resolution
+
+    #if defined(ESP32)
+    delay(1000); // wait for Serial on ESP32
+    #else
+    analogWriteResolution(DAC_BIT_WIDTH);  // Max out DAC resolution
+    #endif
 
     // Initialize the envelope stage
     startTime = millis();
     stage = 0;
-
+    
     Serial.println("Hello Envelope Generator");
 }
 
@@ -51,7 +56,7 @@ void loop() {
     switch (stage) {
         case 0:  // Attack
             if (elapsedTime < T_attack) {
-                envelopeValue = A_max * (1 - exp(-elapsedTime / tau_attack));
+                envelopeValue = A_max * (1 - exp(-(elapsedTime / tau_attack)));
             } else {
                 envelopeValue = A_max;
                 startTime = currentTime;
@@ -61,7 +66,7 @@ void loop() {
 
         case 1:  // Decay
             if (elapsedTime < T_decay) {
-                envelopeValue = A_sustain + (A_max - A_sustain) * exp(-elapsedTime / tau_decay);
+                envelopeValue = A_sustain + (A_max - A_sustain) * exp(-(elapsedTime / tau_decay));
             } else {
                 envelopeValue = A_sustain;
                 startTime = currentTime;
@@ -80,7 +85,7 @@ void loop() {
 
         case 3:  // Release
             if (elapsedTime < T_release) {
-                envelopeValue = A_sustain * exp(-elapsedTime / tau_release);
+                envelopeValue = A_sustain * exp(-(elapsedTime / tau_release));
             } else {
                 envelopeValue = 0;
                 stage = 4;
@@ -89,6 +94,10 @@ void loop() {
 
         case 4:  // Done
             envelopeValue = 0;
+            
+            // TEMP: Restart the envelope
+            startTime = currentTime;
+            stage = 0;
             break;
     }
 #if defined(ESP32)
