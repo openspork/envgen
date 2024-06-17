@@ -30,6 +30,7 @@ public:
     inline void setReleaseDurationMs(double releaseDurationMs) { this->releaseDurationMs = releaseDurationMs; }
     inline void setReleaseShapeFactor(double releaseShapeFactor) { this->releaseShapeFactor = releaseShapeFactor; }
 
+    inline double getEnvelopeStartTime() { return envelopeStartTime; }
     inline double getEnvelopeDurationMs() { return attackDurationMs + decayDurationMs + sustainDurationMs + releaseDurationMs; }
 };
 #endif

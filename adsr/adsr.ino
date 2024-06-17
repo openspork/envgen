@@ -36,7 +36,7 @@ void setup() {
 #endif
 
   // Initialize the envelope stage
-  startTime = millis();
+  adsr.setEnvelopeStartTime(millis());
 
   Serial.println("Hello Envelope Generator");
 
@@ -67,13 +67,13 @@ void loop() {
 //   }
 
   unsigned long currentTime = millis();
-  unsigned long elapsedTime = currentTime - startTime;
-  if(elapsedTime > adsr.getEnvelopeDurationMs()) {
-    startTime = currentTime;
-    elapsedTime = 0;
+
+  // For now, automatically trigger a new adsr envelope once the previous one has finished
+  if(currentTime > adsr.getEnvelopeStartTime() + adsr.getEnvelopeDurationMs()) {
+    adsr.setEnvelopeStartTime(currentTime);
   }
 
-  envelopeValue = adsr.getEnvelopeValue(elapsedTime);
+  envelopeValue = adsr.getEnvelopeValue(currentTime);
 #if defined(ESP32)
   dacWrite(DAC1, envelopeValue);
 #else
