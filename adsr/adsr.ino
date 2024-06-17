@@ -5,6 +5,8 @@
 #define DAC_BIT_WIDTH 8
 #define ENCODER_A_PIN 32
 #define ENCODER_B_PIN 33
+#define ENCODER_BUTTON_PIN 26
+void IRAM_ATTR handleSwitch();
 
 ESP32Encoder encoder;
 #else
@@ -12,6 +14,7 @@ ESP32Encoder encoder;
 #define ENCODER_A_PIN 5
 #define ENCODER_B_PIN 6
 #define DAC_BIT_WIDTH 12
+#define ENCODER_BUTTON_PIN 7
 
 Encoder encoder(ENCODER_A_PIN, ENCODER_B_PIN);
 #endif
@@ -31,9 +34,7 @@ enum EncoderState {
   ATTACK_SHAPE
 };
 
-EncoderState encoderState = ATTACK_SHAPE;
-
-const byte switchPin = 7;
+volatile EncoderState encoderState = ATTACK_DURATION;
 
 long encoderPosition = 0;
 
@@ -55,8 +56,8 @@ void setup() {
 
   Serial.println("Hello Envelope Generator");
 
-  // pinMode(switchPin, INPUT_PULLUP);
-  // attachInterrupt(digitalPinToInterrupt(switchPin), handleSwitch, RISING);
+  pinMode(ENCODER_BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_BUTTON_PIN), handleSwitch, RISING);
 
   // pinMode(buzzPin, OUTPUT);
   // tone(buzzPin, 200);
@@ -73,7 +74,7 @@ void loop() {
     if (newEncoderPosition != encoderPosition) {
         Serial.print("Encoder position: ");
         Serial.println(newEncoderPosition);
-        
+
         long encoderDelta = (newEncoderPosition - encoderPosition);
         encoderPosition = newEncoderPosition;
         double attackDurationMs;
@@ -121,6 +122,12 @@ void loop() {
 #endif
 }
 
+#if defined(ESP32)
+void IRAM_ATTR handleSwitch() {
+# else
 void handleSwitch() {
-  Serial.println("Switch pressed");
+#endif
+  // note: not okay to call Serial.println method on ESP32 here as it blocks.
+  // TODO: probably need to debounce.
+  encoderState = (EncoderState)((encoderState + 1) % 2);
 }
