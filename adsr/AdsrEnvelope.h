@@ -31,6 +31,13 @@ public:
     inline void setReleaseShapeFactor(double releaseShapeFactor) { this->releaseShapeFactor = releaseShapeFactor; }
 
     inline double getEnvelopeStartTime() { return envelopeStartTime; }
+    inline double getEnvelopeMax() { return envelopeMax; }
+    inline double getAttackShapeFactor() { return attackShapeFactor; }
+    inline double getAttackDurationMs() { return attackDurationMs; }
+    inline double getDecayDurationMs() { return decayDurationMs; }
+    inline double getDecayShapeFactor() { return decayShapeFactor; }
+    inline double getSustainDurationMs() { return sustainDurationMs; }
+    inline double getSustainMax() { return sustainMax; }
     inline double getEnvelopeDurationMs() { return attackDurationMs + decayDurationMs + sustainDurationMs + releaseDurationMs; }
 };
 #endif

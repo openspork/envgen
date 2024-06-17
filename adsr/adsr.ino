@@ -1,10 +1,19 @@
-#include <Encoder.h>
 #include "AdsrEnvelope.h"
 
 #if defined(ESP32)
+#include <ESP32Encoder.h>
 #define DAC_BIT_WIDTH 8
+#define ENCODER_A_PIN 32
+#define ENCODER_B_PIN 33
+
+ESP32Encoder encoder;
 #else
+#include <Encoder.h>
+#define ENCODER_A_PIN 5
+#define ENCODER_B_PIN 6
 #define DAC_BIT_WIDTH 12
+
+Encoder encoder(ENCODER_A_PIN, ENCODER_B_PIN);
 #endif
 
 const int A_max = (1 << DAC_BIT_WIDTH) - 1;  // 4095 on 12 bit DAC
@@ -17,10 +26,16 @@ const unsigned long T_release = 250;  // Release time in milliseconds
 int envelopeValue = 0;
 unsigned long startTime = 0;
 
-// Encoder myEnc(5, 6);
+enum EncoderState {
+  ATTACK_DURATION,
+  ATTACK_SHAPE
+};
+
+EncoderState encoderState = ATTACK_SHAPE;
+
 const byte switchPin = 7;
 
-long oldPosition = -999;
+long encoderPosition = 0;
 
 const byte buzzPin = 3;
 
@@ -31,11 +46,11 @@ void setup() {
 
 #if defined(ESP32)
   delay(1000);  // wait for Serial on ESP32
+  encoder.attachHalfQuad(ENCODER_A_PIN, ENCODER_B_PIN);
 #else
   analogWriteResolution(DAC_BIT_WIDTH);  // Max out DAC resolution
 #endif
 
-  // Initialize the envelope stage
   adsr.setEnvelopeStartTime(millis());
 
   Serial.println("Hello Envelope Generator");
@@ -49,22 +64,47 @@ void setup() {
 
 void loop() {
 
-//   long newPosition = myEnc.read();
-//   if (newPosition != oldPosition) {
-//     // Turning knob right position goes down, but want attack to go up
-//     if (newPosition < oldPosition) {
-//       T_attack = T_attack + 25;
+    #if defined(ESP32)
+    long newEncoderPosition = encoder.getCount() / 2;
+    #else
+    long newEncoderPosition = encoder.read() / 4;
+    #endif
 
-//     } else if (newPosition > oldPosition) {
-//       if (T_attack >= 25) {
-//         T_attack = T_attack - 25;
-//       }
-//     }
-
-//     oldPosition = newPosition;
-//     Serial.print("Attack change: ");
-//     Serial.println(T_attack);
-//   }
+    if (newEncoderPosition != encoderPosition) {
+        Serial.print("Encoder position: ");
+        Serial.println(newEncoderPosition);
+        
+        long encoderDelta = (newEncoderPosition - encoderPosition);
+        encoderPosition = newEncoderPosition;
+        double attackDurationMs;
+        double attackShapeFactor;
+        switch (encoderState) {
+        case ATTACK_DURATION:
+            attackDurationMs = adsr.getAttackDurationMs();
+            attackDurationMs += 50 * encoderDelta;
+            if (attackDurationMs > 1000) {
+                attackDurationMs = 1000;
+            } else if (attackDurationMs < 0) {
+                attackDurationMs = 0;
+            }
+            adsr.setAttackDurationMs(attackDurationMs);
+            Serial.print("Attack duration: ");
+            Serial.println(attackDurationMs);
+            break;
+        case ATTACK_SHAPE:
+            attackShapeFactor = adsr.getAttackShapeFactor();
+            attackShapeFactor += 0.5 * encoderDelta;
+            if (attackShapeFactor > 10) {
+                attackShapeFactor = 10;
+            } else if (attackShapeFactor < 4) {
+                attackShapeFactor = 4;
+            }
+            adsr.setAttackShapeFactor(attackShapeFactor);
+            Serial.print("Attack shape factor: ");
+            Serial.println(attackShapeFactor);
+            break;
+        }
+   }
 
   unsigned long currentTime = millis();
 
