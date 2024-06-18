@@ -1,4 +1,5 @@
 #include "AdsrEnvelope.h"
+#include "Display.h"
 
 #if defined(ESP32)
 #include <ESP32Encoder.h>
@@ -35,6 +36,7 @@ enum EncoderState {
 };
 
 volatile EncoderState encoderState = ATTACK_DURATION;
+Display display(240, 135);
 
 long encoderPosition = 0;
 
@@ -58,6 +60,8 @@ void setup() {
 
   pinMode(ENCODER_BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ENCODER_BUTTON_PIN), handleSwitch, RISING);
+
+  display.init();
 
   // pinMode(buzzPin, OUTPUT);
   // tone(buzzPin, 200);
@@ -105,6 +109,7 @@ void loop() {
             Serial.println(attackShapeFactor);
             break;
         }
+        display.drawChart(&adsr);
    }
 
   unsigned long currentTime = millis();

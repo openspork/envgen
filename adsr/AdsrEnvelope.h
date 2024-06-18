@@ -1,4 +1,5 @@
 #ifndef ADSR_ENVELOPE_H
+#define ADSR_ENVELOPE_H
 
 class AdsrEnvelope {
 private:
