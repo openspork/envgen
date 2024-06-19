@@ -17,10 +17,12 @@ private:
     TFT_eSprite chartSprite;
     TFT_eSprite captionSprite;
 
+    void drawChart(AdsrEnvelope* adsr);
+    void drawCaption(AdsrEnvelope* adsr);
 
 public:
     Display(uint16_t screenWidth, uint16_t screenHeight);
     void init();
-    void drawChart(AdsrEnvelope* adsr);
+    void draw(AdsrEnvelope* adsr);
 };
 #endif

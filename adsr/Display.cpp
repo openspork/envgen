@@ -15,6 +15,14 @@ void Display::init() {
     Serial.println("Display initialized");
 }
 
+void Display::draw(AdsrEnvelope* adsr) {
+    drawChart(adsr);
+    drawCaption(adsr);
+
+    chartSprite.pushSprite(0, 0);
+    captionSprite.pushSprite(0, screenHeight - CAPTION_AREA_HEIGHT);
+}
+
 void Display::drawChart(AdsrEnvelope* adsr) {
     chartSprite.fillSprite(TFT_BLACK);
 
@@ -39,7 +47,9 @@ void Display::drawChart(AdsrEnvelope* adsr) {
     captionSprite.setTextFont(1);
     captionSprite.setTextSize(2);
     captionSprite.setTextColor(TFT_WHITE, TFT_BLACK);
+}
 
+void Display::drawCaption(AdsrEnvelope* adsr) {
     char buffer[20];
     snprintf(buffer, sizeof(buffer), "%s: %.1fs", "Attack", adsr->getAttackDurationMs() / 1000.0);
     String leftString = String(buffer);
@@ -50,11 +60,6 @@ void Display::drawChart(AdsrEnvelope* adsr) {
     captionSprite.drawString(leftString, 6, 6);
     int16_t rightX = captionSprite.width() - captionSprite.textWidth(rightString) - 6;
     captionSprite.drawString(rightString, rightX, 6);
-
-    chartSprite.pushSprite(0, 0);
-    captionSprite.pushSprite(0, screenHeight - CAPTION_AREA_HEIGHT);
-
-    Serial.println("Chart drawn");
 }
 
 

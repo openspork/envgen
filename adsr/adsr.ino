@@ -89,8 +89,8 @@ void loop() {
             attackDurationMs += 50 * encoderDelta;
             if (attackDurationMs > 1000) {
                 attackDurationMs = 1000;
-            } else if (attackDurationMs < 0) {
-                attackDurationMs = 0;
+            } else if (attackDurationMs < 100) {
+                attackDurationMs = 50;
             }
             adsr.setAttackDurationMs(attackDurationMs);
             Serial.print("Attack duration: ");
@@ -109,7 +109,7 @@ void loop() {
             Serial.println(attackShapeFactor);
             break;
         }
-        display.drawChart(&adsr);
+        display.draw(&adsr);
    }
 
   unsigned long currentTime = millis();
