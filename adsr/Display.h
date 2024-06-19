@@ -11,8 +11,8 @@ class Display {
 private:
     int screenWidth;
     int screenHeight;
-    uint16_t* buffer;
     TFT_eSPI tft;
+    TFT_eSprite chartSprite;
 
 public:
     Display(int screenWidth, int screenHeight);

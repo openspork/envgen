@@ -1,7 +1,7 @@
 #include "Display.h"
 
-Display::Display(int width, int height) : screenWidth(width), screenHeight(height), tft() {
-    buffer = (uint16_t*)malloc(screenWidth * screenHeight * sizeof(uint16_t));
+Display::Display(int width, int height) : screenWidth(width), screenHeight(height), tft(), chartSprite(&tft) {
+    chartSprite.createSprite(screenWidth, screenHeight);
 }
 
 void Display::init() {
@@ -13,7 +13,10 @@ void Display::init() {
 }
 
 void Display::drawChart(AdsrEnvelope* adsr) {
-    memset (buffer, 0, screenWidth * screenHeight * sizeof(uint16_t));
+    chartSprite.fillSprite(TFT_BLACK);
+
+    int xPrev = 0;
+    int yPrev = -1;
 
     for (int i = 0; i < screenWidth; i++) {
         double time = adsr->getEnvelopeStartTime() + i * adsr->getEnvelopeDurationMs() / screenWidth;
@@ -21,7 +24,14 @@ void Display::drawChart(AdsrEnvelope* adsr) {
 
         int x = screenWidth - 1 - i;
         int y = (int)(envelopeValue * screenHeight / adsr->getEnvelopeMax());
-        buffer[x + y * screenWidth] = TFT_WHITE;
+
+        if (yPrev > 0) {
+          chartSprite.drawLine(xPrev, yPrev, x, y, TFT_WHITE);
+        }
+
+        xPrev = x;
+        yPrev = y;
+
         // Serial.print("[");
         // Serial.print(x);
         // Serial.print(", ");
@@ -29,7 +39,8 @@ void Display::drawChart(AdsrEnvelope* adsr) {
         // Serial.print("] ");
     }
 
-    tft.pushImage(0, 0, screenWidth, screenHeight, buffer);
+    chartSprite.pushSprite(0, 0);
+
     Serial.println("Chart drawn");
 }
 
