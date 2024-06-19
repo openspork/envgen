@@ -9,13 +9,17 @@
 
 class Display {
 private:
-    int screenWidth;
-    int screenHeight;
+    const uint16_t CAPTION_AREA_HEIGHT = 26;
+    uint16_t screenWidth;
+    uint16_t screenHeight;
+    uint16_t chartHeight;
     TFT_eSPI tft;
     TFT_eSprite chartSprite;
+    TFT_eSprite captionSprite;
+
 
 public:
-    Display(int screenWidth, int screenHeight);
+    Display(uint16_t screenWidth, uint16_t screenHeight);
     void init();
     void drawChart(AdsrEnvelope* adsr);
 };
