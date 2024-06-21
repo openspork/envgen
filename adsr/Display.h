@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 #include "AdsrEnvelope.h"
+#include "EncoderHandler.h"
 
 #define TFT_BL   4 // Display backlight control pin
 
@@ -18,11 +19,11 @@ private:
     TFT_eSprite captionSprite;
 
     void drawChart(AdsrEnvelope* adsr);
-    void drawCaption(AdsrEnvelope* adsr);
+    void drawCaption(AdsrEnvelope* adsr, EncoderHandler* encoderHandler);
 
 public:
     Display(uint16_t screenWidth, uint16_t screenHeight);
     void init();
-    void draw(AdsrEnvelope* adsr);
+    void draw(AdsrEnvelope* adsr, EncoderHandler* encoderHandler);
 };
 #endif

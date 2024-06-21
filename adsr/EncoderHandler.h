@@ -32,6 +32,7 @@ class EncoderHandler {
     inline State getState() { return encoderState; }
     void tick();
     void registerOnEncoderChange(OnEncoderChanged callback);
+    inline State getEncoderState() { return encoderState; }
 
     private: 
     static EncoderHandler* instance; 

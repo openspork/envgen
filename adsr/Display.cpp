@@ -15,9 +15,9 @@ void Display::init() {
     Serial.println("Display initialized");
 }
 
-void Display::draw(AdsrEnvelope* adsr) {
+void Display::draw(AdsrEnvelope* adsr, EncoderHandler* encoderHandler) {
     drawChart(adsr);
-    drawCaption(adsr);
+    drawCaption(adsr, encoderHandler);
 
     chartSprite.pushSprite(0, 0);
     captionSprite.pushSprite(0, screenHeight - CAPTION_AREA_HEIGHT);
@@ -49,17 +49,26 @@ void Display::drawChart(AdsrEnvelope* adsr) {
     captionSprite.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
-void Display::drawCaption(AdsrEnvelope* adsr) {
+void Display::drawCaption(AdsrEnvelope* adsr, EncoderHandler* encoderHandler) {
     char buffer[20];
-    snprintf(buffer, sizeof(buffer), "%s: %.1fs", "Attack", adsr->getAttackDurationMs() / 1000.0);
+    switch(encoderHandler->getState()) {
+        case EncoderHandler::ATTACK_DURATION:
+            snprintf(buffer, sizeof(buffer), "%s: %.1fs", "Attack", adsr->getAttackDurationMs() / 1000.0);
+            break;
+        case EncoderHandler::ATTACK_SHAPE:
+            if (adsr->getAttackShapeFactor() < 5) {
+                snprintf(buffer, sizeof(buffer), "%s: %s", "Shape", "Linear");
+            } else {
+                snprintf(buffer, sizeof(buffer), "%s: %.f", "Shape", adsr->getAttackShapeFactor());
+            }
+            break;
+        case EncoderHandler::ENVELOPE_DURATION:
+            snprintf(buffer, sizeof(buffer), "%s: %.1fs", "Envelope", adsr->getEnvelopeDurationMs() / 1000.0);
+            break;
+
+    }
     String leftString = String(buffer);
-
-    snprintf(buffer, sizeof(buffer), "%.1fs", adsr->getEnvelopeDurationMs() / 1000.0);
-    String rightString = String(buffer);
-
     captionSprite.drawString(leftString, 6, 6);
-    int16_t rightX = captionSprite.width() - captionSprite.textWidth(rightString) - 6;
-    captionSprite.drawString(rightString, rightX, 6);
 }
 
 

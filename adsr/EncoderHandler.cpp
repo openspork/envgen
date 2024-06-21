@@ -41,7 +41,8 @@ void EncoderHandler::tick() {
             maxAttackDurationMs = adsr->getEnvelopeDurationMs() - 400;
             if (attackDurationMs > maxAttackDurationMs) {
                 attackDurationMs = maxAttackDurationMs;
-            } else if (attackDurationMs < 50) {
+            }
+            if (attackDurationMs < 50) {
                 attackDurationMs = 50;
             }
             adsr->setAttackDurationMs(attackDurationMs);
@@ -88,6 +89,10 @@ void EncoderHandler::onPushButtonImpl() {
     }
     lastButtonClickTime = millis();
     encoderState = (EncoderHandler::State)((encoderState + 1) % 3);
+
+    if (onEncoderChanged) {
+        onEncoderChanged();
+    }
 }
 
 

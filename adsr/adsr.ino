@@ -39,7 +39,7 @@ void setup() {
   display.init();
   encoderHandler.registerOnEncoderChange(onEncoderChanged);
   encoderHandler.setup();
-  display.draw(&adsr);
+  display.draw(&adsr, &encoderHandler);
 }
 
 void loop() {
@@ -62,5 +62,5 @@ void loop() {
 }
 
 void onEncoderChanged() {
-  display.draw(&adsr);
+  display.draw(&adsr, &encoderHandler);
 }
