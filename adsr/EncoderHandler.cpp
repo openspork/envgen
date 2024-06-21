@@ -58,6 +58,18 @@ void EncoderHandler::tick() {
             Serial.print("Attack shape factor: ");
             Serial.println(attackShapeFactor);
             break;
+        case ENVELOPE_DURATION:
+            double envelopeDurationMs = adsr->getEnvelopeDurationMs();
+            envelopeDurationMs += 50 * encoderDelta;
+            if (envelopeDurationMs > 5000) {
+                envelopeDurationMs = 5000;
+            } else if (envelopeDurationMs < 500) {
+                envelopeDurationMs = 500;
+            }
+            adsr->setEnvelopeDurationMs(envelopeDurationMs);
+            Serial.print("Envelope duration: ");
+            Serial.println(envelopeDurationMs);
+            break;
         }
         if (onEncoderChanged) {
             onEncoderChanged();
@@ -73,7 +85,7 @@ void EncoderHandler::onPushButtonImpl() {
         return;
     }
     lastButtonClickTime = millis();
-    encoderState = (EncoderHandler::State)((encoderState + 1) % 2);
+    encoderState = (EncoderHandler::State)((encoderState + 1) % 3);
 }
 
 

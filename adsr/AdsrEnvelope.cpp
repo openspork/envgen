@@ -61,3 +61,16 @@ double AdsrEnvelope::getEnvelopeValue(double time) {
     return envelopeValue;
 }
 
+void AdsrEnvelope::setEnvelopeDurationMs(double envelopeDurationMs) {
+    double attackDurationMs = this->attackDurationMs;
+    double decayDurationMs = this->decayDurationMs;
+    double sustainDurationMs = this->sustainDurationMs;
+    double releaseDurationMs = this->releaseDurationMs;
+
+    double ratio = envelopeDurationMs / getEnvelopeDurationMs();
+
+    this->attackDurationMs = attackDurationMs * ratio;
+    this->decayDurationMs = decayDurationMs * ratio;
+    this->sustainDurationMs = sustainDurationMs * ratio;
+    this->releaseDurationMs = releaseDurationMs * ratio;
+}

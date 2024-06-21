@@ -25,9 +25,11 @@ class EncoderHandler {
 
     enum State {
         ATTACK_DURATION,
-        ATTACK_SHAPE
+        ATTACK_SHAPE,
+        ENVELOPE_DURATION
     };
 
+    inline State getState() { return encoderState; }
     void tick();
     void registerOnEncoderChange(OnEncoderChanged callback);
 

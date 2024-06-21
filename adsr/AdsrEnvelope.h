@@ -30,6 +30,7 @@ public:
     inline void setSustainDurationMs(double sustainDurationMs) { this->sustainDurationMs = sustainDurationMs; }
     inline void setReleaseDurationMs(double releaseDurationMs) { this->releaseDurationMs = releaseDurationMs; }
     inline void setReleaseShapeFactor(double releaseShapeFactor) { this->releaseShapeFactor = releaseShapeFactor; }
+    void setEnvelopeDurationMs(double envelopeDurationMs);
 
     inline double getEnvelopeStartTime() { return envelopeStartTime; }
     inline double getEnvelopeMax() { return envelopeMax; }
