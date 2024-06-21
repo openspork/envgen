@@ -65,12 +65,24 @@ void EncoderHandler::tick() {
    }
 }
 
+void EncoderHandler::onPushButtonImpl() {
+    // NB: not okay to call Serial.println method on ESP32 here as it blocks.
+
+    // simple debounce
+    if (millis() - lastButtonClickTime < 100) {
+        return;
+    }
+    lastButtonClickTime = millis();
+    encoderState = (EncoderHandler::State)((encoderState + 1) % 2);
+}
+
+
 #if defined(ESP32)
 void IRAM_ATTR EncoderHandler::onPushButton() {
 # else
 void EncoderHandler::onPushButton() {
 #endif
-  // note: not okay to call Serial.println method on ESP32 here as it blocks.
-  // TODO: probably need to debounce.
-  instance->encoderState = (EncoderHandler::State)((instance->encoderState + 1) % 2);
+    if (instance) {
+        instance->onPushButtonImpl();
+    }
 }

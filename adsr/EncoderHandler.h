@@ -35,6 +35,10 @@ class EncoderHandler {
     static EncoderHandler* instance; 
     OnEncoderChanged onEncoderChanged;
     State encoderState;
+    long lastButtonClickTime = 0;
+
+    void onPushButtonImpl();
+    
 #if defined(ESP32)
     ESP32Encoder encoder;
 #else
