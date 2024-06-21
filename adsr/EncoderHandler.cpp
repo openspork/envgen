@@ -33,12 +33,14 @@ void EncoderHandler::tick() {
         encoderPosition = newEncoderPosition;
         double attackDurationMs;
         double attackShapeFactor;
+        double maxAttackDurationMs;
         switch (encoderState) {
         case ATTACK_DURATION:
             attackDurationMs = adsr->getAttackDurationMs();
             attackDurationMs += 50 * encoderDelta;
-            if (attackDurationMs > 1000) {
-                attackDurationMs = 1000;
+            maxAttackDurationMs = adsr->getEnvelopeDurationMs() - 400;
+            if (attackDurationMs > maxAttackDurationMs) {
+                attackDurationMs = maxAttackDurationMs;
             } else if (attackDurationMs < 50) {
                 attackDurationMs = 50;
             }
