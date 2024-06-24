@@ -2,7 +2,7 @@
 
 EncoderHandler* EncoderHandler::instance = nullptr;  
 
-EncoderHandler::EncoderHandler(AdsrEnvelope* adsr) : adsr(adsr), encoderState(ATTACK_DURATION) {
+EncoderHandler::EncoderHandler(AdsrEnvelope* adsr) : adsr(adsr), encoder(ENCODER_A_PIN, ENCODER_B_PIN), encoderState(ATTACK_DURATION) {
     instance = this;
 }
 
