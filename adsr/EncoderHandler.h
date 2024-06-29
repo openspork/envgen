@@ -6,19 +6,22 @@
 
 #if defined(ESP32)
 #include <ESP32Encoder.h>
-#define ENCODER_A_PIN 32
-#define ENCODER_B_PIN 33
-#define ENCODER_BUTTON_PIN 26
 #else
 #include <Encoder.h>
-#define ENCODER_A_PIN 5
-#define ENCODER_B_PIN 6
-#define ENCODER_BUTTON_PIN 7
-
 #endif
 
 class EncoderHandler {
     public:
+    #if defined(ESP32)
+    const int ENCODER_A_PIN = 32;
+    const int ENCODER_B_PIN = 33;
+    const int ENCODER_BUTTON_PIN = 26;
+    #else
+    const int ENCODER_A_PIN = 1;
+    const int ENCODER_B_PIN = 2;
+    const int ENCODER_BUTTON_PIN = 3;
+    #endif
+
     using OnEncoderChanged = void(*)();
     EncoderHandler(AdsrEnvelope* adsr);
     void setup();
@@ -36,21 +39,20 @@ class EncoderHandler {
 
     private: 
     static EncoderHandler* instance; 
-    OnEncoderChanged onEncoderChanged;
+    AdsrEnvelope* adsr;
+    #if defined(ESP32)
+        ESP32Encoder encoder;
+    #else
+        Encoder encoder;
+    #endif
     State encoderState;
+    OnEncoderChanged onEncoderChanged;
     long lastButtonClickTime = 0;
 
     void onPushButtonImpl();
     
-#if defined(ESP32)
-    ESP32Encoder encoder;
-#else
-    Encoder encoder(ENCODER_A_PIN, ENCODER_B_PIN);
-#endif
 
     long encoderPosition = 0;
-
-    AdsrEnvelope* adsr;
 
     #if defined(ESP32)
     static void IRAM_ATTR onPushButton();

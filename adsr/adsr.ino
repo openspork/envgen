@@ -6,6 +6,7 @@
 #define DAC_BIT_WIDTH 8
 #else
 #define DAC_BIT_WIDTH 12
+#define DAC_PIN 7
 #endif
 
 int envelopeValue = 0;
@@ -57,7 +58,7 @@ void loop() {
 #if defined(ESP32)
   dacWrite(DAC1, envelopeValue);
 #else
-  analogWrite(DAC, envelopeValue);
+  analogWrite(DAC_PIN, envelopeValue);
 #endif
 }
 
